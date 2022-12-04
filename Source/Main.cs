@@ -1,0 +1,19 @@
+using Godot;
+
+public partial class Main : Node
+{
+	private int MapSize = 128;
+
+	public override void _Ready()
+	{
+		var tileMap = GetNode<TileMap>("TileMap");
+
+		for (var x = 0; x < MapSize; x++)
+		{
+			for (var y = 0; y < MapSize; y++)
+			{
+				tileMap.SetCell(0, new Vector2i(x, y), 1, Vector2i.Zero);
+			}
+		}
+	}
+}
