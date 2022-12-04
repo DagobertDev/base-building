@@ -1,3 +1,4 @@
+using System;
 using Godot;
 
 public partial class Main : Node
@@ -8,11 +9,14 @@ public partial class Main : Node
 	{
 		var tileMap = GetNode<TileMap>("TileMap");
 
+		var random = new Random();
+
 		for (var x = 0; x < MapSize; x++)
 		{
 			for (var y = 0; y < MapSize; y++)
 			{
-				tileMap.SetCell(0, new Vector2i(x, y), 1, Vector2i.Zero);
+				var tile = random.Next(2);
+				tileMap.SetCell(0, new Vector2i(x, y), 1, new Vector2i(tile, 0));
 			}
 		}
 	}
