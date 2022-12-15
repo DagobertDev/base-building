@@ -1,8 +1,10 @@
-[gd_scene load_steps=4 format=3 uid="uid://bj1800g275fwr"]
+[gd_scene load_steps=6 format=3 uid="uid://bj1800g275fwr"]
 
 [ext_resource type="Script" path="res://Main.cs" id="1_dmuv0"]
 [ext_resource type="TileSet" uid="uid://c35rrrtketg8h" path="res://Assets/tileset.tres" id="2_ldstv"]
 [ext_resource type="Script" path="res://UI/Camera.cs" id="2_qxm1g"]
+[ext_resource type="Script" path="res://WallPlacer.cs" id="4_7m6sg"]
+[ext_resource type="Texture2D" uid="uid://e18nq1hgarj3" path="res://Assets/wall.png" id="5_rmvh5"]
 
 [node name="Main" type="Node"]
 script = ExtResource("1_dmuv0")
@@ -14,3 +16,7 @@ script = ExtResource("2_qxm1g")
 [node name="TileMap" type="TileMap" parent="."]
 tile_set = ExtResource("2_ldstv")
 format = 2
+
+[node name="WallPlacer" type="Node2D" parent="."]
+script = ExtResource("4_7m6sg")
+_texture = ExtResource("5_rmvh5")
