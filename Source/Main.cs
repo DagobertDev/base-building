@@ -1,13 +1,15 @@
 using System;
 using Godot;
 
+namespace BaseBuilding;
+
 public partial class Main : Node
 {
-	private int MapSize = 128;
+	public const int MapSize = 128;
 
 	public override void _Ready()
 	{
-		var tileMap = GetNode<TileMap>("TileMap");
+		var tileMap = GetNode<TileMap>("%Map");
 
 		var random = new Random();
 

@@ -14,7 +14,7 @@ public partial class WallPlacer : Node2D
 		  
 		if (@event.IsActionPressed(InputActions.MouseclickLeft))
 		{
-			var tileMap = GetNode<TileMap>("../TileMap");
+			var tileMap = GetNode<TileMap>("%Map");
 			var mousePosition = GetLocalMousePosition();	
 			var mapPosition = tileMap.MapToLocal(tileMap.LocalToMap(mousePosition));
 			
