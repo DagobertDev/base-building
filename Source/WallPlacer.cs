@@ -18,10 +18,11 @@ public partial class WallPlacer : Node2D
 			var mousePosition = GetLocalMousePosition();	
 			var mapPosition = tileMap.MapToLocal(tileMap.LocalToMap(mousePosition));
 			
-			GetParent().AddChild(new Sprite2D
+			tileMap.AddChild(new Sprite2D
 			{
 				Texture = _texture,
 				GlobalPosition = mapPosition,
+				ZIndex = 1
 			});
 			
 			GetTree().Root.SetInputAsHandled();
