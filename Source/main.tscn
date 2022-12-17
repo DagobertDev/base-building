@@ -19,10 +19,6 @@ unique_name_in_owner = true
 tile_set = ExtResource("2_ldstv")
 format = 2
 
-[node name="WallPlacer" type="Node2D" parent="."]
-script = ExtResource("4_7m6sg")
-_texture = ExtResource("5_rmvh5")
-
 [node name="UILayer" type="CanvasLayer" parent="."]
 
 [node name="MainMenu" type="VBoxContainer" parent="UILayer"]
@@ -52,6 +48,27 @@ text = "Load Game"
 layout_mode = 2
 text = "Exit Menu"
 
+[node name="BuildMenu" type="HBoxContainer" parent="UILayer"]
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -50.0
+offset_top = -50.0
+offset_right = 50.0
+grow_horizontal = 2
+grow_vertical = 0
+size_flags_vertical = 8
+script = ExtResource("4_7m6sg")
+_texture = ExtResource("5_rmvh5")
+
+[node name="WallButton" type="Button" parent="UILayer/BuildMenu"]
+custom_minimum_size = Vector2(100, 50)
+layout_mode = 2
+text = "Wall"
+
 [connection signal="pressed" from="UILayer/MainMenu/SaveButton" to="UILayer/MainMenu" method="SaveGame"]
 [connection signal="pressed" from="UILayer/MainMenu/LoadButton" to="UILayer/MainMenu" method="LoadGame"]
 [connection signal="pressed" from="UILayer/MainMenu/ExitMenuButton" to="UILayer/MainMenu" method="ToggleVisibility"]
+[connection signal="pressed" from="UILayer/BuildMenu/WallButton" to="UILayer/BuildMenu" method="SetEnabled" binds= [true]]
