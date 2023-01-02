@@ -2,40 +2,28 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using BaseBuilding.Assets;
 using Godot;
 
 namespace BaseBuilding;
 
 public partial class BuildMenu : Control
 {
-	public enum BuildMode
-	{
-		Disabled = 0, Wall = 1, Remove = 2,
-	}
-
 	private readonly ObjectPool<Sprite2D> _ghosts = new();
+	private Building? _building;
 
-	private BuildMode _buildMode = BuildMode.Disabled;
-
+	private readonly BuildingCollection _buildingCollection = new();
 	private Vector2i? _dragStart;
-
-	[Export(PropertyHint.ResourceType, nameof(Texture2D))]
-	private Texture2D _texture = null!;
 
 	public override void _Ready()
 	{
 		SetEnabled(false);
 	}
 
-	public void SetMode(BuildMode buildMode)
+	public void SetMode(string building)
 	{
-		if (!Enum.IsDefined(buildMode))
-		{
-			throw new ArgumentException(nameof(buildMode));
-		}
-
-		_buildMode = buildMode;
-		SetEnabled(_buildMode != BuildMode.Disabled);
+		_building = _buildingCollection.GetBuilding(building);
+		SetEnabled(_building != null);
 	}
 
 	private void SetEnabled(bool enabled)
@@ -60,7 +48,7 @@ public partial class BuildMenu : Control
 
 	public override void _UnhandledInput(InputEvent @event)
 	{
-		Debug.Assert(_texture != null);
+		Debug.Assert(_building != null);
 
 		if (_dragStart == null && @event.IsActionPressed(InputActions.MouseclickLeft))
 		{
@@ -77,8 +65,20 @@ public partial class BuildMenu : Control
 			var mousePosition = tileMap.GetGlobalMousePosition();
 			var clampedMousePosition = tileMap.LocalToMap(mousePosition);
 
-			if (_buildMode == BuildMode.Wall)
+			if (_building == _buildingCollection.Remove)
 			{
+				foreach (var cell in GetPositionsInRectangle(_dragStart.Value, clampedMousePosition))
+				{
+					var position = tileMap.MapToLocal(cell);
+					var nodeName = $"{position}";
+					var node = tileMap.GetNodeOrNull(nodeName);
+					node?.Free();
+				}
+			}
+			else
+			{
+				ArgumentNullException.ThrowIfNull(_building);
+
 				foreach (var cell in GetPositionsInRectangle(_dragStart.Value, clampedMousePosition))
 				{
 					var position = tileMap.MapToLocal(cell);
@@ -92,21 +92,11 @@ public partial class BuildMenu : Control
 
 					tileMap.AddChild(new Sprite2D
 					{
-						Texture = _texture,
+						Texture = _building.Texture,
 						GlobalPosition = position,
 						ZIndex = 1,
 						Name = nodeName,
 					});
-				}
-			}
-			else if (_buildMode == BuildMode.Remove)
-			{
-				foreach (var cell in GetPositionsInRectangle(_dragStart.Value, clampedMousePosition))
-				{
-					var position = tileMap.MapToLocal(cell);
-					var nodeName = $"{position}";
-					var node = tileMap.GetNodeOrNull(nodeName);
-					node?.Free();
 				}
 			}
 
@@ -146,6 +136,8 @@ public partial class BuildMenu : Control
 		{
 			return;
 		}
+		
+		ArgumentNullException.ThrowIfNull(_building);
 
 		var mousePosition = tileMap.GetGlobalMousePosition();
 		var clampedMousePosition = tileMap.LocalToMap(mousePosition);
@@ -155,18 +147,13 @@ public partial class BuildMenu : Control
 			var position = tileMap.MapToLocal(cell);
 			var nodeName = $"{position}";
 
-			var modulate = _buildMode switch
-			{
-				BuildMode.Wall => Colors.White.Lerp(Colors.Transparent, 0.5f),
-				BuildMode.Remove => Colors.Red.Lerp(Colors.Transparent, 0.5f),
-				_ => throw new ArgumentOutOfRangeException(nameof(_buildMode)),
-			};
+			var texture = _building.Texture;
 
 			var sprite = _ghosts.Acquire();
-			sprite.Texture = _texture;
+			sprite.Texture = texture;
 			sprite.GlobalPosition = position;
 			sprite.Name = nodeName;
-			sprite.SelfModulate = modulate;
+			sprite.SelfModulate = Colors.White.Lerp(Colors.Transparent, 0.3f);
 			buildGhost.AddChild(sprite);
 		}
 	}

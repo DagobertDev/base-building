@@ -4,7 +4,7 @@
 [ext_resource type="TileSet" uid="uid://c35rrrtketg8h" path="res://Assets/tileset.tres" id="2_ldstv"]
 [ext_resource type="Script" path="res://UI/Camera.cs" id="2_qxm1g"]
 [ext_resource type="Script" path="res://BuildMenu.cs" id="4_7m6sg"]
-[ext_resource type="Texture2D" uid="uid://e18nq1hgarj3" path="res://Assets/wall.png" id="5_rmvh5"]
+[ext_resource type="Texture2D" uid="uid://duqew84qamm1v" path="res://icon.svg" id="6_hh01a"]
 [ext_resource type="Script" path="res://UI/MainMenu.cs" id="6_hqpjo"]
 
 [node name="Main" type="Node"]
@@ -61,7 +61,7 @@ grow_horizontal = 2
 grow_vertical = 0
 size_flags_vertical = 8
 script = ExtResource("4_7m6sg")
-_texture = ExtResource("5_rmvh5")
+_placeholderTexture = ExtResource("6_hh01a")
 
 [node name="WallButton" type="Button" parent="UILayer/BuildMenu"]
 custom_minimum_size = Vector2(100, 50)
@@ -76,5 +76,5 @@ text = "Delete"
 [connection signal="pressed" from="UILayer/MainMenu/SaveButton" to="UILayer/MainMenu" method="SaveGame"]
 [connection signal="pressed" from="UILayer/MainMenu/LoadButton" to="UILayer/MainMenu" method="LoadGame"]
 [connection signal="pressed" from="UILayer/MainMenu/ExitMenuButton" to="UILayer/MainMenu" method="ToggleVisibility"]
-[connection signal="pressed" from="UILayer/BuildMenu/WallButton" to="UILayer/BuildMenu" method="SetMode" binds= [1]]
-[connection signal="pressed" from="UILayer/BuildMenu/DeleteButton" to="UILayer/BuildMenu" method="SetMode" binds= [2]]
+[connection signal="pressed" from="UILayer/BuildMenu/WallButton" to="UILayer/BuildMenu" method="SetMode" binds= ["wall"]]
+[connection signal="pressed" from="UILayer/BuildMenu/DeleteButton" to="UILayer/BuildMenu" method="SetMode" binds= ["remove"]]
