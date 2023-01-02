@@ -9,10 +9,9 @@ namespace BaseBuilding;
 
 public partial class BuildMenu : Control
 {
+	private readonly BuildingCollection _buildingCollection = new();
 	private readonly ObjectPool<Sprite2D> _ghosts = new();
 	private Building? _building;
-
-	private readonly BuildingCollection _buildingCollection = new();
 	private Vector2i? _dragStart;
 
 	public override void _Ready()
@@ -136,7 +135,7 @@ public partial class BuildMenu : Control
 		{
 			return;
 		}
-		
+
 		ArgumentNullException.ThrowIfNull(_building);
 
 		var mousePosition = tileMap.GetGlobalMousePosition();
@@ -147,10 +146,8 @@ public partial class BuildMenu : Control
 			var position = tileMap.MapToLocal(cell);
 			var nodeName = $"{position}";
 
-			var texture = _building.Texture;
-
 			var sprite = _ghosts.Acquire();
-			sprite.Texture = texture;
+			sprite.Texture = _building.GhostTexture;
 			sprite.GlobalPosition = position;
 			sprite.Name = nodeName;
 			sprite.SelfModulate = Colors.White.Lerp(Colors.Transparent, 0.3f);

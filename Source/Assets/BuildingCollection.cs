@@ -10,8 +10,8 @@ public class BuildingCollection
 {
 	// TODO: Load buildings dynamically
 	private readonly IReadOnlyCollection<Building> _buildings = ImmutableArray.Create(
-		new Building("Remove", GD.Load<Texture2D>("res://Assets/remove_building.png")),
-		new Building("Wall", GD.Load<Texture2D>("res://Assets/wall.png"))
+		Create("Remove", "res://Assets/remove_building.png", "res://Assets/remove_building.png"),
+		Create("Wall", "res://Assets/wall.png", "res://Assets/wall_outline.png")
 	);
 
 	public Building Remove => GetBuilding("Remove");
@@ -20,5 +20,10 @@ public class BuildingCollection
 	{
 		var x = _buildings;
 		return _buildings.Single(building => building.Name.Equals(id, StringComparison.InvariantCultureIgnoreCase));
+	}
+
+	private static Building Create(string name, string texture, string ghostTexture)
+	{
+		return new Building(name, GD.Load<Texture2D>(texture), GD.Load<Texture2D>(ghostTexture));
 	}
 }
