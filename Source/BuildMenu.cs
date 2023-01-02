@@ -66,10 +66,9 @@ public partial class BuildMenu : Control
 
 			if (_building == _buildingCollection.Remove)
 			{
-				foreach (var cell in GetPositionsInRectangle(_dragStart.Value, clampedMousePosition))
+				foreach (var tile in GetTilesInRectangle(_dragStart.Value, clampedMousePosition))
 				{
-					var position = tileMap.MapToLocal(cell);
-					var nodeName = $"{position}";
+					var nodeName = $"{tile}";
 					var node = tileMap.GetNodeOrNull(nodeName);
 					node?.Free();
 				}
@@ -78,16 +77,17 @@ public partial class BuildMenu : Control
 			{
 				ArgumentNullException.ThrowIfNull(_building);
 
-				foreach (var cell in GetPositionsInRectangle(_dragStart.Value, clampedMousePosition))
+				foreach (var tile in GetTilesInRectangle(_dragStart.Value, clampedMousePosition))
 				{
-					var position = tileMap.MapToLocal(cell);
-					var nodeName = $"{position}";
+					var nodeName = $"{tile}";
 
 					if (tileMap.HasNode(nodeName))
 					{
-						// TODO: Consider cancelling placement if invalid cell is selected
+						// TODO: Consider cancelling placement if invalid tile is selected
 						continue;
 					}
+
+					var position = tileMap.MapToLocal(tile);
 
 					tileMap.AddChild(new Sprite2D
 					{
@@ -141,21 +141,39 @@ public partial class BuildMenu : Control
 		var mousePosition = tileMap.GetGlobalMousePosition();
 		var clampedMousePosition = tileMap.LocalToMap(mousePosition);
 
-		foreach (var cell in GetPositionsInRectangle(_dragStart.Value, clampedMousePosition))
+		foreach (var tile in GetTilesInRectangle(_dragStart.Value, clampedMousePosition))
 		{
-			var position = tileMap.MapToLocal(cell);
-			var nodeName = $"{position}";
+			var position = tileMap.MapToLocal(tile);
+			var nodeName = $"{tile}";
 
 			var sprite = _ghosts.Acquire();
 			sprite.Texture = _building.GhostTexture;
 			sprite.GlobalPosition = position;
 			sprite.Name = nodeName;
-			sprite.SelfModulate = Colors.White.Lerp(Colors.Transparent, 0.3f);
+
+			if (!CanBuild(tile))
+			{
+				sprite.SelfModulate = Colors.Red;
+			}
+
 			buildGhost.AddChild(sprite);
 		}
 	}
 
-	private IEnumerable<Vector2i> GetPositionsInRectangle(Vector2i cornerOne, Vector2i cornerTwo)
+	private bool CanBuild(Vector2i tile)
+	{
+		var tileMap = GetNode<TileMap>("%Map");
+		var nodeName = $"{tile}";
+
+		if (tileMap.HasNode(nodeName))
+		{
+			return false;
+		}
+
+		return true;
+	}
+
+	private static IEnumerable<Vector2i> GetTilesInRectangle(Vector2i cornerOne, Vector2i cornerTwo)
 	{
 		var start = cornerOne;
 		var end = cornerTwo;
