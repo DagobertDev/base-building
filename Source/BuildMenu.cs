@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using Godot;
 
 namespace BaseBuilding;
@@ -11,6 +12,8 @@ public partial class BuildMenu : Control
 	{
 		Disabled = 0, Wall = 1, Remove = 2,
 	}
+
+	private readonly ObjectPool<Sprite2D> _ghosts = new();
 
 	private BuildMode _buildMode = BuildMode.Disabled;
 
@@ -37,7 +40,22 @@ public partial class BuildMenu : Control
 
 	private void SetEnabled(bool enabled)
 	{
+		SetProcess(enabled);
 		SetProcessUnhandledInput(enabled);
+
+		_dragStart = null;
+
+		var tileMap = GetNode<TileMap>("%Map");
+		var buildGhost = tileMap.GetNodeOrNull<Node2D>("BuildGhost");
+
+		if (buildGhost != null)
+		{
+			foreach (var sprite in buildGhost.GetChildren().Cast<Sprite2D>())
+			{
+				buildGhost.RemoveChild(sprite);
+				_ghosts.Release(sprite);
+			}
+		}
 	}
 
 	public override void _UnhandledInput(InputEvent @event)
@@ -101,13 +119,65 @@ public partial class BuildMenu : Control
 		}
 	}
 
+	public override void _Process(double delta)
+	{
+		var tileMap = GetNode<TileMap>("%Map");
+		var buildGhost = tileMap.GetNodeOrNull<Node2D>("BuildGhost");
+
+		if (buildGhost == null)
+		{
+			buildGhost = new Node2D
+			{
+				Name = "BuildGhost",
+				ZIndex = 2,
+			};
+			tileMap.AddChild(buildGhost);
+		}
+		else
+		{
+			foreach (var sprite in buildGhost.GetChildren().Cast<Sprite2D>())
+			{
+				buildGhost.RemoveChild(sprite);
+				_ghosts.Release(sprite);
+			}
+		}
+
+		if (_dragStart == null)
+		{
+			return;
+		}
+
+		var mousePosition = tileMap.GetGlobalMousePosition();
+		var clampedMousePosition = tileMap.LocalToMap(mousePosition);
+
+		foreach (var cell in GetPositionsInRectangle(_dragStart.Value, clampedMousePosition))
+		{
+			var position = tileMap.MapToLocal(cell);
+			var nodeName = $"{position}";
+
+			var modulate = _buildMode switch
+			{
+				BuildMode.Wall => Colors.White.Lerp(Colors.Transparent, 0.5f),
+				BuildMode.Remove => Colors.Red.Lerp(Colors.Transparent, 0.5f),
+				_ => throw new ArgumentOutOfRangeException(nameof(_buildMode)),
+			};
+
+			var sprite = _ghosts.Acquire();
+			sprite.Texture = _texture;
+			sprite.GlobalPosition = position;
+			sprite.Name = nodeName;
+			sprite.SelfModulate = modulate;
+			buildGhost.AddChild(sprite);
+		}
+	}
+
 	private IEnumerable<Vector2i> GetPositionsInRectangle(Vector2i cornerOne, Vector2i cornerTwo)
 	{
 		var start = cornerOne;
 		var end = cornerTwo;
 
 		if (start.x > end.x)
-		{ 
+		{
 			(end.x, start.x) = (start.x, end.x);
 		}
 
