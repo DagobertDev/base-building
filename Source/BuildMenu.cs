@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using BaseBuilding.Assets;
 using Godot;
@@ -18,6 +19,9 @@ public partial class BuildMenu : Control
 	{
 		_ghosts = new ObjectPool<Sprite2D>(ResetSprite);
 	}
+
+	[MemberNotNullWhen(true, nameof(_dragStart))]
+	private bool IsDragging => _dragStart != null;
 
 	public override void _Ready()
 	{
@@ -54,7 +58,7 @@ public partial class BuildMenu : Control
 	{
 		Debug.Assert(_building != null);
 
-		if (_dragStart == null && @event.IsActionPressed(InputActions.MouseclickLeft))
+		if (!IsDragging && @event.IsActionPressed(InputActions.MouseclickLeft))
 		{
 			var tileMap = GetNode<TileMap>("%Map");
 			var mousePosition = tileMap.GetGlobalMousePosition();
@@ -63,54 +67,59 @@ public partial class BuildMenu : Control
 
 		if (@event.IsActionReleased(InputActions.MouseclickLeft))
 		{
-			ArgumentNullException.ThrowIfNull(_dragStart);
-
-			var tileMap = GetNode<TileMap>("%Map");
-			var mousePosition = tileMap.GetGlobalMousePosition();
-			var clampedMousePosition = tileMap.LocalToMap(mousePosition);
-
-			if (_building == _buildingCollection.Remove)
-			{
-				foreach (var tile in GetTilesInRectangle(_dragStart.Value, clampedMousePosition))
-				{
-					var nodeName = $"{tile}";
-					var node = tileMap.GetNodeOrNull(nodeName);
-					node?.Free();
-				}
-			}
-			else
-			{
-				ArgumentNullException.ThrowIfNull(_building);
-
-				foreach (var tile in GetTilesInRectangle(_dragStart.Value, clampedMousePosition))
-				{
-					var nodeName = $"{tile}";
-
-					if (tileMap.HasNode(nodeName))
-					{
-						// TODO: Consider cancelling placement if invalid tile is selected
-						continue;
-					}
-
-					var position = tileMap.MapToLocal(tile);
-
-					tileMap.AddChild(new Sprite2D
-					{
-						Texture = _building.Texture,
-						GlobalPosition = position,
-						ZIndex = 1,
-						Name = nodeName,
-					});
-				}
-			}
-
-			_dragStart = null;
-			GetTree().Root.SetInputAsHandled();
+			HandleMouseDrag(_building);
 		}
 		else if (@event.IsActionPressed(InputActions.MouseclickRight))
 		{
 			SetEnabled(false);
 		}
+	}
+
+	private void HandleMouseDrag(Building building)
+	{
+		Debug.Assert(IsDragging);
+
+		var tileMap = GetNode<TileMap>("%Map");
+		var mousePosition = tileMap.GetGlobalMousePosition();
+		var clampedMousePosition = tileMap.LocalToMap(mousePosition);
+
+		if (_building == _buildingCollection.Remove)
+		{
+			foreach (var tile in GetTilesInRectangle(_dragStart.Value, clampedMousePosition))
+			{
+				var nodeName = $"{tile}";
+				var node = tileMap.GetNodeOrNull(nodeName);
+				node?.Free();
+			}
+		}
+		else
+		{
+			foreach (var tile in GetTilesInRectangle(_dragStart.Value, clampedMousePosition))
+			{
+				PlaceGhost(tileMap, building, tile);
+			}
+		}
+
+		_dragStart = null;
+		GetTree().Root.SetInputAsHandled();
+	}
+
+	private static void PlaceGhost(TileMap tileMap, Building building, Vector2i tile)
+	{
+		var nodeName = $"{tile}";
+
+		if (tileMap.HasNode(nodeName))
+		{
+			// TODO: Consider cancelling placement if invalid tile is selected
+			return;
+		}
+
+		var position = tileMap.MapToLocal(tile);
+
+		tileMap.AddChild(new Sprite2D
+		{
+			Texture = building.Texture, GlobalPosition = position, ZIndex = 1, Name = nodeName,
+		});
 	}
 
 	public override void _Process(double delta)
@@ -120,11 +129,7 @@ public partial class BuildMenu : Control
 
 		if (buildGhost == null)
 		{
-			buildGhost = new Node2D
-			{
-				Name = "BuildGhost",
-				ZIndex = 2,
-			};
+			buildGhost = new Node2D { Name = "BuildGhost", ZIndex = 2 };
 			tileMap.AddChild(buildGhost);
 		}
 		else
@@ -136,7 +141,7 @@ public partial class BuildMenu : Control
 			}
 		}
 
-		if (_dragStart == null)
+		if (!IsDragging)
 		{
 			return;
 		}
