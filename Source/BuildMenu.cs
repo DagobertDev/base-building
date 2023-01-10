@@ -10,9 +10,14 @@ namespace BaseBuilding;
 public partial class BuildMenu : Control
 {
 	private readonly BuildingCollection _buildingCollection = new();
-	private readonly ObjectPool<Sprite2D> _ghosts = new();
+	private readonly ObjectPool<Sprite2D> _ghosts;
 	private Building? _building;
 	private Vector2i? _dragStart;
+
+	public BuildMenu()
+	{
+		_ghosts = new ObjectPool<Sprite2D>(ResetSprite);
+	}
 
 	public override void _Ready()
 	{
@@ -198,5 +203,14 @@ public partial class BuildMenu : Control
 				yield return start + new Vector2i(offsetX, offsetY);
 			}
 		}
+	}
+
+	private static void ResetSprite(Sprite2D sprite)
+	{
+		sprite.ZIndex = default;
+		sprite.Position = default;
+		sprite.GlobalPosition = default;
+		sprite.Modulate = Colors.White;
+		sprite.SelfModulate = Colors.White;
 	}
 }
