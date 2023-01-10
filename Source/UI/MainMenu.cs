@@ -1,8 +1,9 @@
 using System.Collections.Generic;
 using System.Linq;
-using BaseBuilding;
 using Godot;
 using Newtonsoft.Json;
+
+namespace BaseBuilding.UI;
 
 public partial class MainMenu : Control
 {
