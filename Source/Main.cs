@@ -18,7 +18,7 @@ public partial class Main : Node
 			for (var y = 0; y < MapSize; y++)
 			{
 				var tile = random.Next(2);
-				tileMap.SetCell(0, new Vector2i(x, y), 1, new Vector2i(tile, 0));
+				tileMap.SetCell(0, new Vector2I(x, y), 1, new Vector2I(tile, 0));
 			}
 		}
 	}

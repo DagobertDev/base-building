@@ -23,19 +23,19 @@ public partial class MainMenu : Control
 	{
 		var tileMap = GetNode<TileMap>("%Map");
 
-		var tiles = new Vector2i[Main.MapSize * Main.MapSize];
+		var tiles = new Vector2I[Main.MapSize * Main.MapSize];
 
 		for (var x = 0; x < Main.MapSize; x++)
 		{
 			for (var y = 0; y < Main.MapSize; y++)
 			{
-				tiles[x + y * Main.MapSize] = tileMap.GetCellAtlasCoords(0, new Vector2i(x, y));
+				tiles[x + y * Main.MapSize] = tileMap.GetCellAtlasCoords(0, new Vector2I(x, y));
 			}
 		}
 
 		var walls = tileMap.GetChildren().Cast<Sprite2D>()
-			.Select(sprite => new WallData((Vector2i)sprite.Position, sprite.Texture.ResourcePath)).ToList();
-		
+			.Select(sprite => new WallData((Vector2I)sprite.Position, sprite.Texture.ResourcePath)).ToList();
+
 		var saveData = new SaveData(Main.MapSize, Main.MapSize, tiles, walls);
 
 		_saveFile = JsonConvert.SerializeObject(saveData);
@@ -61,7 +61,7 @@ public partial class MainMenu : Control
 		{
 			for (var y = 0; y < saveData.MapHeight; y++)
 			{
-				tileMap.SetCell(0, new Vector2i(x, y), 1, saveData.Tiles[x + y * saveData.MapWidth]);
+				tileMap.SetCell(0, new Vector2I(x, y), 1, saveData.Tiles[x + y * saveData.MapWidth]);
 			}
 		}
 
@@ -69,9 +69,7 @@ public partial class MainMenu : Control
 		{
 			tileMap.AddChild(new Sprite2D
 			{
-				Texture = GD.Load<Texture2D>(wallData.Texture),
-				GlobalPosition = wallData.Position,
-				ZIndex = 1,
+				Texture = GD.Load<Texture2D>(wallData.Texture), GlobalPosition = wallData.Position, ZIndex = 1,
 			});
 		}
 	}
@@ -81,6 +79,7 @@ public partial class MainMenu : Control
 		Visible = !Visible;
 	}
 
-	private record SaveData(int MapWidth, int MapHeight, Vector2i[] Tiles, IEnumerable<WallData> Walls);
-	private record WallData(Vector2i Position, string Texture);
+	private record SaveData(int MapWidth, int MapHeight, Vector2I[] Tiles, IEnumerable<WallData> Walls);
+
+	private record WallData(Vector2I Position, string Texture);
 }

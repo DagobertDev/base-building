@@ -13,7 +13,7 @@ public partial class BuildMenu : Control
 	private readonly BuildingCollection _buildingCollection = new();
 	private readonly ObjectPool<Sprite2D> _ghosts;
 	private Building? _building;
-	private Vector2i? _dragStart;
+	private Vector2I? _dragStart;
 
 	public BuildMenu()
 	{
@@ -104,7 +104,7 @@ public partial class BuildMenu : Control
 		GetTree().Root.SetInputAsHandled();
 	}
 
-	private static void PlaceGhost(TileMap tileMap, Building building, Vector2i tile)
+	private static void PlaceGhost(TileMap tileMap, Building building, Vector2I tile)
 	{
 		var nodeName = $"{tile}";
 
@@ -170,7 +170,7 @@ public partial class BuildMenu : Control
 		}
 	}
 
-	private bool CanBuild(Vector2i tile)
+	private bool CanBuild(Vector2I tile)
 	{
 		var tileMap = GetNode<TileMap>("%Map");
 		var nodeName = $"{tile}";
@@ -183,29 +183,29 @@ public partial class BuildMenu : Control
 		return true;
 	}
 
-	private static IEnumerable<Vector2i> GetTilesInRectangle(Vector2i cornerOne, Vector2i cornerTwo)
+	private static IEnumerable<Vector2I> GetTilesInRectangle(Vector2I cornerOne, Vector2I cornerTwo)
 	{
 		var start = cornerOne;
 		var end = cornerTwo;
 
-		if (start.x > end.x)
+		if (start.X > end.X)
 		{
-			(end.x, start.x) = (start.x, end.x);
+			(end.X, start.X) = (start.X, end.X);
 		}
 
-		if (start.y > end.y)
+		if (start.Y > end.Y)
 		{
-			(end.y, start.y) = (start.y, end.y);
+			(end.Y, start.Y) = (start.Y, end.Y);
 		}
 
-		var width = end.x - start.x;
-		var height = end.y - start.y;
+		var width = end.X - start.X;
+		var height = end.Y - start.Y;
 
 		for (var offsetX = 0; offsetX <= width; offsetX++)
 		{
 			for (var offsetY = 0; offsetY <= height; offsetY++)
 			{
-				yield return start + new Vector2i(offsetX, offsetY);
+				yield return start + new Vector2I(offsetX, offsetY);
 			}
 		}
 	}
