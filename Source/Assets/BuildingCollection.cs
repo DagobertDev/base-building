@@ -12,7 +12,8 @@ public class BuildingCollection
 	private readonly IReadOnlyCollection<Building> _buildings = ImmutableArray.Create(
 		Create("Remove", "res://Assets/remove_building.png", "res://Assets/remove_building.png"),
 		Create("Wall", "res://Assets/wall.png", "res://Assets/wall_outline.png"),
-		Create("Carpet", "res://Assets/carpet.png", "res://Assets/wall_outline.png"));
+		Create("Carpet", "res://Assets/carpet.png", "res://Assets/wall_outline.png"), 
+		Create("Tree", "res://Assets/tree.png", "res://Assets/wall_outline.png"));
 
 	public Building Remove => GetBuilding("Remove");
 
