@@ -65,6 +65,11 @@ custom_minimum_size = Vector2(100, 50)
 layout_mode = 2
 text = "Wall"
 
+[node name="Workbench" type="Button" parent="UILayer/BuildMenu"]
+custom_minimum_size = Vector2(100, 50)
+layout_mode = 2
+text = "Workbench"
+
 [node name="CarpetButton" type="Button" parent="UILayer/BuildMenu"]
 custom_minimum_size = Vector2(100, 50)
 layout_mode = 2
@@ -84,6 +89,7 @@ text = "Delete"
 [connection signal="pressed" from="UILayer/MainMenu/LoadButton" to="UILayer/MainMenu" method="LoadGame"]
 [connection signal="pressed" from="UILayer/MainMenu/ExitMenuButton" to="UILayer/MainMenu" method="ToggleVisibility"]
 [connection signal="pressed" from="UILayer/BuildMenu/WallButton" to="UILayer/BuildMenu" method="SetMode" binds= ["wall"]]
+[connection signal="pressed" from="UILayer/BuildMenu/Workbench" to="UILayer/BuildMenu" method="SetMode" binds= ["workbench"]]
 [connection signal="pressed" from="UILayer/BuildMenu/CarpetButton" to="UILayer/BuildMenu" method="SetMode" binds= ["carpet"]]
 [connection signal="pressed" from="UILayer/BuildMenu/TreeButton" to="UILayer/BuildMenu" method="SetMode" binds= ["tree"]]
 [connection signal="pressed" from="UILayer/BuildMenu/DeleteButton" to="UILayer/BuildMenu" method="SetMode" binds= ["remove"]]
