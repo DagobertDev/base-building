@@ -1,4 +1,5 @@
 using System;
+using DefaultEcs;
 using Godot;
 
 namespace BaseBuilding;
@@ -6,6 +7,7 @@ namespace BaseBuilding;
 public partial class Main : Node
 {
 	public const int MapSize = 128;
+	public static World World { get; } = new();
 
 	public override void _Ready()
 	{

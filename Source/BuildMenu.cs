@@ -4,6 +4,8 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using BaseBuilding.Assets;
+using BaseBuilding.Components;
+using DefaultEcs;
 using Godot;
 
 namespace BaseBuilding;
@@ -11,6 +13,7 @@ namespace BaseBuilding;
 public partial class BuildMenu : Control
 {
 	private readonly BuildingCollection _buildingCollection = new();
+	private readonly EntityMultiMap<Tile> _entitiesByTile;
 	private readonly ObjectPool<Sprite2D> _ghosts;
 	private Building? _building;
 	private Vector2I? _dragStart;
@@ -18,6 +21,7 @@ public partial class BuildMenu : Control
 	public BuildMenu()
 	{
 		_ghosts = new ObjectPool<Sprite2D>(ResetSprite);
+		_entitiesByTile = Main.World.GetEntities().AsMultiMap<Tile>();
 	}
 
 	[MemberNotNullWhen(true, nameof(_dragStart))]
@@ -104,11 +108,11 @@ public partial class BuildMenu : Control
 		GetTree().Root.SetInputAsHandled();
 	}
 
-	private static void PlaceGhost(TileMap tileMap, Building building, Vector2I tile)
+	private void PlaceGhost(TileMap tileMap, Building building, Vector2I tile)
 	{
 		var nodeName = $"{tile}";
 
-		if (tileMap.HasNode(nodeName))
+		if (_entitiesByTile.TryGetEntities(tile, out var entities) && entities.Length > 0)
 		{
 			// TODO: Consider cancelling placement if invalid tile is selected
 			return;
@@ -116,10 +120,17 @@ public partial class BuildMenu : Control
 
 		var position = tileMap.MapToLocal(tile);
 
-		tileMap.AddChild(new Sprite2D
+		var sprite = new Sprite2D
 		{
 			Texture = building.Texture, GlobalPosition = position, ZIndex = 1, Name = nodeName,
-		});
+		};
+
+		tileMap.AddChild(sprite);
+
+		var entity = Main.World.CreateEntity();
+		entity.Set(sprite);
+		entity.Set<Position>(position);
+		entity.Set<Tile>(tile);
 	}
 
 	public override void _Process(double delta)
@@ -172,15 +183,12 @@ public partial class BuildMenu : Control
 
 	private bool CanBuild(Vector2I tile)
 	{
-		var tileMap = GetNode<TileMap>("%Map");
-		var nodeName = $"{tile}";
-
-		if (tileMap.HasNode(nodeName))
+		if (!_entitiesByTile.TryGetEntities(tile, out var entities))
 		{
-			return false;
+			return true;
 		}
 
-		return true;
+		return entities.Length == 0;
 	}
 
 	private static IEnumerable<Vector2I> GetTilesInRectangle(Vector2I cornerOne, Vector2I cornerTwo)
