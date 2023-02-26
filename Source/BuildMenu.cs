@@ -91,9 +91,17 @@ public partial class BuildMenu : Control
 		{
 			foreach (var tile in GetTilesInRectangle(_dragStart.Value, clampedMousePosition))
 			{
-				var nodeName = $"{tile}";
-				var node = tileMap.GetNodeOrNull(nodeName);
-				node?.Free();
+				if (!_entitiesByTile.TryGetEntities(tile, out var entities))
+				{
+					continue;
+				}
+
+				foreach (var entity in entities)
+				{
+					var sprite = entity.Get<Sprite2D>();
+					sprite.Free();
+					entity.Dispose();
+				}
 			}
 		}
 		else
@@ -110,7 +118,7 @@ public partial class BuildMenu : Control
 
 	private void PlaceGhost(TileMap tileMap, Building building, Vector2I tile)
 	{
-		var nodeName = $"{tile}";
+		var nodeName = $"{building.Name} {tile}";
 
 		if (_entitiesByTile.TryGetEntities(tile, out var entities) && entities.Length > 0)
 		{
@@ -165,7 +173,7 @@ public partial class BuildMenu : Control
 		foreach (var tile in GetTilesInRectangle(_dragStart.Value, clampedMousePosition))
 		{
 			var position = tileMap.MapToLocal(tile);
-			var nodeName = $"{tile}";
+			var nodeName = $"Ghost {tile}";
 
 			var sprite = _ghosts.Acquire();
 			sprite.Texture = _building.GhostTexture;

@@ -1,10 +1,11 @@
-[gd_scene load_steps=6 format=3 uid="uid://bj1800g275fwr"]
+[gd_scene load_steps=7 format=3 uid="uid://bj1800g275fwr"]
 
 [ext_resource type="Script" path="res://Main.cs" id="1_dmuv0"]
 [ext_resource type="TileSet" uid="uid://c35rrrtketg8h" path="res://Assets/tileset.tres" id="2_ldstv"]
 [ext_resource type="Script" path="res://UI/Camera.cs" id="2_qxm1g"]
 [ext_resource type="Script" path="res://BuildMenu.cs" id="4_7m6sg"]
 [ext_resource type="Script" path="res://UI/MainMenu.cs" id="6_hqpjo"]
+[ext_resource type="Script" path="res://UI/EntityDisplay.cs" id="6_susgc"]
 
 [node name="Main" type="Node"]
 script = ExtResource("1_dmuv0")
@@ -84,6 +85,9 @@ text = "Tree"
 custom_minimum_size = Vector2(100, 50)
 layout_mode = 2
 text = "Delete"
+
+[node name="EntityDisplay" type="Label" parent="UILayer"]
+script = ExtResource("6_susgc")
 
 [connection signal="pressed" from="UILayer/MainMenu/SaveButton" to="UILayer/MainMenu" method="SaveGame"]
 [connection signal="pressed" from="UILayer/MainMenu/LoadButton" to="UILayer/MainMenu" method="LoadGame"]
