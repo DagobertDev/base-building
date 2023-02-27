@@ -160,17 +160,14 @@ public partial class BuildMenu : Control
 			}
 		}
 
-		if (!IsDragging)
-		{
-			return;
-		}
-
 		ArgumentNullException.ThrowIfNull(_building);
 
 		var mousePosition = tileMap.GetGlobalMousePosition();
 		var clampedMousePosition = tileMap.LocalToMap(mousePosition);
 
-		foreach (var tile in GetTilesInRectangle(_dragStart.Value, clampedMousePosition))
+		var start = IsDragging ? _dragStart.Value : clampedMousePosition;
+
+		foreach (var tile in GetTilesInRectangle(start, clampedMousePosition))
 		{
 			var position = tileMap.MapToLocal(tile);
 			var nodeName = $"Ghost {tile}";
