@@ -47,6 +47,11 @@ text = "Load Game"
 layout_mode = 2
 text = "Exit Menu"
 
+[node name="EntityDisplay" type="Label" parent="UILayer"]
+offset_right = 1.0
+offset_bottom = 23.0
+script = ExtResource("6_susgc")
+
 [node name="BuildMenu" type="HBoxContainer" parent="UILayer"]
 anchors_preset = 7
 anchor_left = 0.5
@@ -85,9 +90,6 @@ text = "Tree"
 custom_minimum_size = Vector2(100, 50)
 layout_mode = 2
 text = "Delete"
-
-[node name="EntityDisplay" type="Label" parent="UILayer"]
-script = ExtResource("6_susgc")
 
 [connection signal="pressed" from="UILayer/MainMenu/SaveButton" to="UILayer/MainMenu" method="SaveGame"]
 [connection signal="pressed" from="UILayer/MainMenu/LoadButton" to="UILayer/MainMenu" method="LoadGame"]

@@ -68,8 +68,7 @@ public partial class BuildMenu : Control
 			var mousePosition = tileMap.GetGlobalMousePosition();
 			_dragStart = tileMap.LocalToMap(mousePosition);
 		}
-
-		if (@event.IsActionReleased(InputActions.MouseclickLeft))
+		else if (@event.IsActionReleased(InputActions.MouseclickLeft))
 		{
 			HandleMouseDrag(_building);
 		}
@@ -81,11 +80,14 @@ public partial class BuildMenu : Control
 
 	private void HandleMouseDrag(Building building)
 	{
-		Debug.Assert(IsDragging);
-
 		var tileMap = GetNode<TileMap>("%Map");
 		var mousePosition = tileMap.GetGlobalMousePosition();
 		var clampedMousePosition = tileMap.LocalToMap(mousePosition);
+
+		if (!IsDragging)
+		{
+			_dragStart = clampedMousePosition;
+		}
 
 		if (_building == _buildingCollection.Remove)
 		{
